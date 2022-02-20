@@ -18,12 +18,15 @@ This is a simple HTML Game
 | `npm run build` | Builds code bundle with production settings (minification, no source maps, etc..) |
 
 ## Folder structure
-  public/ -> this folder is meant contain all assets in an `asset/` folder and the `index.html` file to be used as entry point for the game. The folder contents will be copied into the `dist/` folder during build time so all references to assets within the source code should be done directly to `asset/foo.png` instead of to the public folder
+```
+  public/ -> this folder is meant contain all assets in an `asset/` folder and the `index.html` file to be used as entry point for the game. The 
+  folder contents will be copied into the `dist/` folder during build time so all references to assets within the source code should be done directly 
+  to `asset/foo.png` instead of to the public folder
   
   src/ -> this is the project's root containing all source code
     game.ts -> phaser game configs and entry point/initializer. This is also the main source file to be used as rollup.js' compilation source
     scenes/ -> in here you will find all of the game scenes fully indexed
-
+```
 
 ## Writing Code
 
