@@ -1,6 +1,8 @@
-# Phaser 3 TypeScript Project Template
+# A simple HTML game
 
-This quick-start project template combines Phaser 3.50 with [TypeScript 4](https://www.typescriptlang.org/) and uses [Rollup](https://rollupjs.org) for bundling.
+This is a simple HTML Game
+
+![Screen Shot 2022-02-19 at 10 11 31 PM](https://user-images.githubusercontent.com/59832188/154828127-a1b36733-69cd-4f42-be63-e8b02e5cc872.png)
 
 ## Requirements
 
@@ -15,12 +17,18 @@ This quick-start project template combines Phaser 3.50 with [TypeScript 4](https
 | `npm run dev` | Builds project and open web server, but do not watch for changes |
 | `npm run build` | Builds code bundle with production settings (minification, no source maps, etc..) |
 
+## Folder structure
+  public/ -> this folder is meant contain all assets in an `asset/` folder and the `index.html` file to be used as entry point for the game. The folder contents will be copied into the `dist/` folder during build time so all references to assets within the source code should be done directly to `asset/foo.png` instead of to the public folder
+  
+  src/ -> this is the project's root containing all source code
+    game.ts -> phaser game configs and entry point/initializer. This is also the main source file to be used as rollup.js' compilation source
+    scenes/ -> in here you will find all of the game scenes fully indexed
+
+
 ## Writing Code
 
 After cloning the repo, run `npm install` from your project directory. Then, you can start the local development
-server by running `npm run watch`. The first time you run this you should see the following demo run:
-
-![Screenshot](screenshot.png "Phaser 3 Example")
+server by running `npm run watch`.
 
 After starting the development server with `npm run watch`, you can edit any files in the `src` folder
 and Rollup will automatically recompile and reload your server (available at `http://localhost:10001`
