@@ -25,7 +25,7 @@ export default class MenuScene extends BaseScene {
   ];
 
   init() {
-    this.calculateCenters();
+    this.loadWindowDimensions();
   }
 
   preload() {
@@ -45,7 +45,7 @@ export default class MenuScene extends BaseScene {
     startBtn.on('pointerdown', this.startGame);
   }
 
-  startGame(): void {
+  startGame = () => {
     this.scene.start('game');
   }
 }
