@@ -2,8 +2,6 @@ import Phaser from 'phaser';
 
 type SceneConfig = Phaser.Types.Scenes.SettingsConfig | string;
 
-export type MixedAssets = string;
-
 /**
  * Base scene class extending phaser scene it includes a few extra utilities.
  * Such as `centerX` and `centerY` to easily point the middle of the screen.
@@ -22,18 +20,30 @@ class BaseScene extends Phaser.Scene {
     public centerY: number;
 
     /**
-     * Calculates centerX and centerY and sets them. Call this method during the init phase before any usage
+     * The window's width
      */
-    calculateCenters(): void {
-        this.centerX = Number(this.sys.game.config.width) / 2;
-        this.centerY = Number(this.sys.game.config.height) / 2;
+    public windowWidth: number;
+
+    /**
+     * The window's height
+     */
+    public windowHeight: number;
+
+    /**
+     * Loads in window dimensions. Call this method during the init phase before any usage
+     */
+    loadWindowDimensions = () => {
+        this.windowWidth = Number(this.sys.game.config.width);
+        this.windowHeight = Number(this.sys.game.config.height);
+        this.centerX = this.windowWidth / 2;
+        this.centerY = this.windowHeight / 2;
     }
     
     /**
      * Call this method during the loading stage before loading any assets. 
      * It will fill in the path so only asset names will be needed when loading assets.
      */
-    loadPath(): void {
+    loadPath = () => {
         this.load.path = 'assets/';
     }
 }
