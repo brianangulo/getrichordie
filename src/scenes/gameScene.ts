@@ -1,30 +1,20 @@
 import BaseScene from './BaseScene';
-import { ImageAsset, SpriteAsset, Cursors, Player, FrameNumbersConfig } from './types';
+import { ImageAsset, Cursors, PlayerGameObject } from './types';
+import Player from '../game_objects/Player';
 
 enum AssetKeys {
   GameBg = 'game-bg',
   Floor = 'floor',
 }
 
-enum AnimationsKeys {
-  Damage = 'damage',
-  Idle = 'idle',
-  Runing = 'runing',
-  Attack = 'attack',
-  Jump = 'jump',
-  Death = 'death',
-}
-
-const PLAYER_WIDTH = 24;
-const PLAYER_HEIGHT = 48;
-
 export default class Game extends BaseScene {
   constructor() {
     super('game');
+    this.playerInstance = new Player(this);
   }
-
+  private playerInstance: Player;
   private cursors: Cursors;
-  private player: Player;
+  private player: PlayerGameObject;
 
   private imgAssets: ImageAsset[] = [
     {
@@ -34,72 +24,6 @@ export default class Game extends BaseScene {
     {
       key: AssetKeys.Floor,
       url: 'tile.png',
-    },
-  ];
-
-  private spriteAssets: SpriteAsset[] = [
-    {
-      key: AnimationsKeys.Idle,
-      url: 'player_idle.png',
-    },
-    {
-      key: AnimationsKeys.Attack,
-      url: 'player_attack.png',
-    },
-    {
-      key: AnimationsKeys.Damage,
-      url: 'player_hurt.png',
-    },
-    {
-      key: AnimationsKeys.Jump,
-      url: 'player_jump.png',
-    },
-    {
-      key: AnimationsKeys.Runing,
-      url: 'player_run.png',
-    },
-    {
-      key: AnimationsKeys.Death,
-      url: 'player_death.png',
-    },
-    // adding frame configs dynamically
-  ].map((asset) => ({
-    ...asset,
-    frameConfig: {
-      frameWidth: PLAYER_WIDTH,
-      frameHeight: PLAYER_HEIGHT,
-    },
-  }));
-
-  private playerAnimations: {
-    key: AnimationsKeys;
-    frames: string | FrameNumbersConfig;
-    frameRate: number;
-  }[] = [
-    {
-      key: AnimationsKeys.Damage,
-      frames: AnimationsKeys.Damage,
-      frameRate: 6,
-    },
-    {
-      key: AnimationsKeys.Idle,
-      frames: { frames: [0, 2, 4, 6] },
-      frameRate: 6,
-    },
-    {
-      key: AnimationsKeys.Attack,
-      frames: AnimationsKeys.Attack,
-      frameRate: 6,
-    },
-    {
-      key: AnimationsKeys.Jump,
-      frames: AnimationsKeys.Jump,
-      frameRate: 6,
-    },
-    {
-      key: AnimationsKeys.Runing,
-      frames: AnimationsKeys.Runing,
-      frameRate: 6,
     },
   ];
 
@@ -131,27 +55,7 @@ export default class Game extends BaseScene {
     return ground;
   };
 
-  private createPlayer = () => {
-    const player = this.physics.add.sprite(
-      this.centerX,
-      this.centerY,
-      'player'
-    );
-    player.setScale(2);
-    player.setCollideWorldBounds();
-    // adding player animations
-    this.playerAnimations.map(({ key, frameRate, frames }) => {
-      this.anims.create({
-        key: key,
-        frames: typeof frames === 'string' ? frames : this.anims.generateFrameNumbers(key, frames),
-        frameRate: frameRate,
-        repeat: -1,
-      });
-    });
-
-    return player;
-  };
-
+  // engine methods
   init() {
     this.loadWindowDimensions();
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -160,17 +64,16 @@ export default class Game extends BaseScene {
   preload() {
     this.loadPath();
     this.load.image(this.imgAssets);
-    this.load.spritesheet(this.spriteAssets);
+    this.playerInstance.loadPlayerSprites();
   }
 
   create() {
     this.createBackground();
     // spreads out the ground
     const ground = this.createGround();
-    this.player = this.createPlayer();
+    this.player = this.playerInstance.createPlayer(this.centerX, this.centerY, 4);
     // colliding with the ground
     this.physics.add.collider(this.player, ground);
-    this.player.play(AnimationsKeys.Damage);
-    this.player.play(AnimationsKeys.Idle);
+    this.player.play('idle');
   }
 }
