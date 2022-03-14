@@ -1,4 +1,4 @@
-import { Scene, SpriteAsset, FrameNumbersConfig } from './types';
+import { Scene, SpriteAsset, FrameNumbersConfig, PlayerGameObject, GameObject, Cursors } from './types';
 
 enum AnimationsKeys {
   Damage = 'damage',
@@ -22,6 +22,9 @@ class Player {
    */
   public readonly key?: string;
 
+  public player: PlayerGameObject;
+  public static readonly PLAYER_WIDTH = PLAYER_WIDTH;
+  public static readonly PLAYER_HEIGHT = PLAYER_HEIGHT;
   constructor(sceneContext: Scene, key: string = 'player') {
     this.scene = sceneContext;
     this.key = key;
@@ -105,13 +108,13 @@ class Player {
    * @returns The player object
    */
   public createPlayer = (xCoord: number, yCoord: number, scale: number = 2) => {
-    const player = this.scene.physics.add.sprite(
+    this.player = this.scene.physics.add.sprite(
       xCoord,
       yCoord,
       this.key
     );
-    player.setScale(scale);
-    player.setCollideWorldBounds();
+    this.player.setScale(scale);
+    this.player.setCollideWorldBounds();
     // adding player animations
     this.playerAnimations.map(({ key, frameRate, frames }) => {
       this.scene.anims.create({
@@ -122,8 +125,20 @@ class Player {
       });
     });
 
-    return player;
+    return this.player;
   };
+
+  public playerMovement = (cursors: Cursors) => {
+
+  };
+
+  /**
+   * Adds collision with the player
+   * @param object a game object to check for collisions against the player
+   */
+  public addPlayerCollider = (object: GameObject) => {
+    this.scene.physics.add.collider(this.player, object);
+  }
 
   /**
    * Loads in the sprite sheet into the scene. Run this on the preload method
