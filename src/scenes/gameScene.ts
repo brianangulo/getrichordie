@@ -1,5 +1,5 @@
 import BaseScene from './BaseScene';
-import { ImageAsset, Cursors, PlayerGameObject } from './types';
+import { ImageAsset, Cursors, StaticGround } from './types';
 import Player from '../game_objects/Player';
 
 enum AssetKeys {
@@ -14,7 +14,7 @@ export default class Game extends BaseScene {
   }
   private playerInstance: Player;
   private cursors: Cursors;
-  private player: PlayerGameObject;
+  private ground: StaticGround;
 
   private imgAssets: ImageAsset[] = [
     {
@@ -42,18 +42,29 @@ export default class Game extends BaseScene {
     // in pixels
     const groundTileSize = 32;
     const tilesQuantity: number = Math.ceil(this.windowWidth / groundTileSize);
-    const ground = this.physics.add.staticGroup();
+    this.ground = this.physics.add.staticGroup();
+    let tileData: Phaser.Types.GameObjects.Group.GroupCreateConfig[] = [];
     // looping till outside the screen
     for (let index = 0; index <= tilesQuantity; index++) {
       // where to place the tile
       const tileXPos = index === 0 ? index : groundTileSize * index;
       // ground as a static group of 2
-      ground.create(tileXPos, this.windowHeight - 15, AssetKeys.Floor);
-      ground.create(tileXPos, this.windowHeight - 47, AssetKeys.Floor);
+      let topTileData: typeof tileData[0] = {
+        setXY: { x: tileXPos, y: this.windowHeight - 15 },
+        key: AssetKeys.Floor,
+      };
+      let bottomTileData: typeof tileData[0] = {
+        setXY: { x: tileXPos, y: this.windowHeight - 47 },
+        key: AssetKeys.Floor,
+      };
+      tileData.push(topTileData, bottomTileData);
     }
-
-    return ground;
+    this.ground.createMultiple(tileData);
   };
+  // we need this to run separately to make sure body width and height are available when called
+  private resizePlayerBox = () => {
+    this.playerInstance.player.body.setSize(Player.PLAYER_WIDTH, Player.PLAYER_HEIGHT, true);
+  }
 
   // engine methods
   init() {
@@ -70,10 +81,16 @@ export default class Game extends BaseScene {
   create() {
     this.createBackground();
     // spreads out the ground
-    const ground = this.createGround();
-    this.player = this.playerInstance.createPlayer(this.centerX, this.centerY, 4);
-    // colliding with the ground
-    this.physics.add.collider(this.player, ground);
-    this.player.play('idle');
+    this.createGround();
+    // creates the player
+    this.playerInstance.createPlayer(this.centerX, this.centerY, 3);
+    // adds collision with the ground
+    this.playerInstance.addPlayerCollider(this.ground);
+    this.playerInstance.player.play('idle');
+    this.resizePlayerBox();
+  }
+
+  update(time: number, delta: number) {
+      
   }
 }
