@@ -61,10 +61,6 @@ export default class Game extends BaseScene {
     }
     this.ground.createMultiple(tileData);
   };
-  // we need this to run separately to make sure body width and height are available when called
-  private resizePlayerBox = () => {
-    this.playerInstance.player.body.setSize(Player.PLAYER_WIDTH, Player.PLAYER_HEIGHT, true);
-  }
 
   // engine methods
   init() {
@@ -83,14 +79,12 @@ export default class Game extends BaseScene {
     // spreads out the ground
     this.createGround();
     // creates the player
-    this.playerInstance.createPlayer(this.centerX, this.centerY, 3);
+    this.playerInstance.createPlayer(this.centerX, this.centerY, 2);
     // adds collision with the ground
     this.playerInstance.addPlayerCollider(this.ground);
-    this.playerInstance.player.play('idle');
-    this.resizePlayerBox();
   }
 
   update(time: number, delta: number) {
-      
+      this.playerInstance.playerMovement(this.cursors);
   }
 }
