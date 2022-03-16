@@ -30,8 +30,6 @@ class Player {
   public readonly key?: string;
 
   public player: PlayerGameObject;
-  public static readonly PLAYER_WIDTH = PLAYER_WIDTH;
-  public static readonly PLAYER_HEIGHT = PLAYER_HEIGHT;
   constructor(sceneContext: Scene, key: string = 'player') {
     this.scene = sceneContext;
     this.key = key;
@@ -71,6 +69,7 @@ class Player {
     frameConfig: {
       frameWidth: PLAYER_WIDTH,
       frameHeight: PLAYER_HEIGHT,
+      spacing: PLAYER_WIDTH,
     },
   }));
 
@@ -86,7 +85,7 @@ class Player {
     },
     {
       key: AnimationsKeys.Idle,
-      frames: { frames: [0, 2, 4, 6] },
+      frames: AnimationsKeys.Idle,
       frameRate: 6,
     },
     {
@@ -96,12 +95,12 @@ class Player {
     },
     {
       key: AnimationsKeys.Jump,
-      frames: { frames: [0, 2, 4, 6] },
+      frames: AnimationsKeys.Jump,
       frameRate: 4,
     },
     {
       key: AnimationsKeys.Runing,
-      frames: { frames: [0, 2, 4, 6, 8, 10] },
+      frames: AnimationsKeys.Runing,
       frameRate: 8,
     },
   ];
@@ -117,7 +116,7 @@ class Player {
   public createPlayer = (xCoord: number, yCoord: number, scale?: number) => {
     this.player = this.scene.physics.add.sprite(xCoord, yCoord, this.key);
     this.player.body.setSize(PLAYER_WIDTH - 5, PLAYER_HEIGHT - 14);
-    this.player.body.setOffset(4 ,14);
+    this.player.body.setOffset(4, 14);
     if (scale) {
       this.player.setScale(scale);
     }
@@ -147,20 +146,21 @@ class Player {
       this.player.x += 6;
       this.player.anims.play(AnimationsKeys.Runing, true);
       this.player.flipX = false;
-    } else if (left) {
+    }
+    if (left) {
       this.player.x -= 6;
       this.player.anims.play(AnimationsKeys.Runing, true);
       this.player.flipX = true;
-    } else if (up) { 
-        // if the player is also on the ground we set velocity
-        if (onGround) {
-          this.player.body.setVelocityY(-350);
-        }
-        // else if the player is just in the air we play jump animation
-    } else if (!onGround) {
-        this.player.anims.play(AnimationsKeys.Jump, true);
-    } else {
-        this.player.anims.play(AnimationsKeys.Idle, true);
+    }
+    // if the player is also on the ground we set velocity
+    if (up && onGround) {
+      this.player.body.setVelocityY(-350);
+    }
+    if (!onGround) {
+      this.player.anims.play(AnimationsKeys.Jump, true);
+    }
+    if (onGround && !up && !left && !right) {
+      this.player.anims.play(AnimationsKeys.Idle, true);
     }
   };
 
