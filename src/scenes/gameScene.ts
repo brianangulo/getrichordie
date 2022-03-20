@@ -2,6 +2,7 @@ import BaseScene from './BaseScene';
 import { ImageAsset, Cursors, StaticGround, HealthBar } from './types';
 import Player from '../game_objects/Player';
 import Money from '../game_objects/Money';
+import { GameObject } from '../game_objects/types';
 
 enum AssetKeys {
   GameBg = 'game-bg',
@@ -15,6 +16,8 @@ export default class Game extends BaseScene {
   }
   public static readonly MAX_PLAYER_HEALTH = 1000;
   public static readonly PLAYER_HEALTH_UPDATE_AMOUNT = 10;
+  public static readonly MONEY_STRAP = 3;
+  public static readonly RAIN_INTERVAL = 500; // in ms
   private playerHealth: number = 1000;
   private playerInstance: Player;
   private cursors: Cursors;
@@ -108,6 +111,13 @@ export default class Game extends BaseScene {
     bar.x = x;
     bar.y = y;
 
+    // writing health bar verbiage
+    this.add.text(this.centerX, bar.y - 16, 'HEALTH', {
+      fontSize: '16px',
+      fontStyle: 'bold',
+      color: 'black',
+    })
+
     //return the bar
     return bar;
   };
@@ -117,8 +127,34 @@ export default class Game extends BaseScene {
     bar.scaleX = percentage / 100;
   }
 
+  private slowlyLowerPlayerHealthAndMakeItRain = (delta: number, interval: number) => {
+    // decreasing player health on a timer
+    this.timer += delta;
+    while (this.timer > interval) {
+      this.decreasePlayerHealth();
+      this.makeItRain(Game.MONEY_STRAP);
+      this.timer -= interval;
+    }
+  }
+
+  private playerAndMoneyOverlapCallback = (money: Money) => {
+    money.destroy();
+    this.increasePlayerHealth();
+  }
+       
   // makes money objects rain
-  private makeItRain = () => {};
+  private makeItRain = (quantity: number) => {
+    const randomY = Math.round(Math.random() * this.windowHeight - 100);
+    // either left or right side
+    const randomX = [0, this.windowWidth][Math.round(Math.random())];
+    // instantiating some money, no need to clear it as they will get destroyed on collision
+    for (let index = 0; index < quantity; index++) {
+      new Money(this, randomX, randomY, this.ground, this.centerX, {
+        player: this.playerInstance.player,
+        callback: this.playerAndMoneyOverlapCallback,
+      });
+    }
+  };
 
   // engine methods
   init() {
@@ -141,25 +177,13 @@ export default class Game extends BaseScene {
     this.playerInstance.createPlayer(this.centerX, this.centerY, 2);
     // adds collision with the ground
     this.playerInstance.addPlayerCollider(this.ground);
-    // add money
-    const money = new Money(this, this.centerX, this.centerY, this.ground);
+    // health bar
     this.healthBar = this.createPlayerHealthBar(this.centerX, 50, 0xe74c3c);
-    // writing health bar verbiage
-    this.add.text(this.centerX, this.healthBar.y - 16, 'HEALTH', {
-      fontSize: '16px',
-      fontStyle: 'bold',
-      color: 'black',
-    })
   }
   private timer: number = 0;
   update(time: number, delta: number) {
     this.playerInstance.playerMovement(this.cursors);
     this.updateHealthBar(this.healthBar, 0.10 * this.playerHealth);
-    // decreasing player health on a timer
-    this.timer += delta;
-    while (this.timer > 500) {
-      this.decreasePlayerHealth();
-      this.timer -= 500;
-    }
+    this.slowlyLowerPlayerHealthAndMakeItRain(delta, Game.RAIN_INTERVAL);
   }
 }
