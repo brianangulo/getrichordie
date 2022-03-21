@@ -150,7 +150,7 @@ class Player {
         .play(AnimationsKeys.Runing, true)
         .once(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
           this.scene.sound.play(AssetKeys.HitSound, {
-            volume: 0.08,
+            volume: 0.03,
             detune: 500,
             delay: 0.3,
           });
@@ -163,7 +163,7 @@ class Player {
         .play(AnimationsKeys.Runing, true)
         .once(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
           this.scene.sound.play(AssetKeys.HitSound, {
-            volume: 0.08,
+            volume: 0.03,
             detune: 300,
             delay: 0.3,
           });

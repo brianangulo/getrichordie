@@ -107,9 +107,12 @@ export default class Game extends BaseScene {
     if (!(this.playerHealth - Game.PLAYER_HEALTH_UPDATE_AMOUNT < 0)) {
       this.playerHealth -= Game.PLAYER_HEALTH_UPDATE_AMOUNT;
     } else {
-      // game over
-      console.log('game over fool');
-      this.sound.play(AssetKeys.DeathSound);
+      // clearing up memory and the scene before moving to the next
+      this.sound.stopAll();
+      this.registry.destroy();
+      this.events.destroy();
+      this.scene.stop(this);
+      this.scene.start('gameOver');
     }
   };
 
@@ -167,7 +170,9 @@ export default class Game extends BaseScene {
 
   private playerAndMoneyOverlapCallback = (money: Money) => {
     money.destroy();
-    this.sound.play(AssetKeys.CollectSound);
+    this.sound.play(AssetKeys.CollectSound, {
+      volume: 0.5,
+    });
     this.increasePlayerHealth();
   }
        
@@ -187,7 +192,9 @@ export default class Game extends BaseScene {
 
   private playPlayerHitsGroundSound = () => {
     if (this.playerInstance.player.body.onFloor() && this.isPlayerFalling) {
-      this.sound.play(AssetKeys.HitSound);
+      this.sound.play(AssetKeys.HitSound, {
+        volume: 0.5,
+      });
       this.isPlayerFalling = false;
     }
     if (this.playerInstance.player.body.velocity.y > 0) {

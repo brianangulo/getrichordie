@@ -1,3 +1,4 @@
 import MenuScene from './menuScene';
 import Game from './GameScene';
-export {MenuScene, Game};
+import GameOver from './gameOverScene';
+export {MenuScene, Game, GameOver};
