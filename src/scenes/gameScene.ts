@@ -1,13 +1,8 @@
 import BaseScene from './BaseScene';
-import { ImageAsset, Cursors, StaticGround, HealthBar } from './types';
+import { Asset, Cursors, StaticGround, HealthBar, AssetKeys } from './types';
 import Player from '../game_objects/Player';
 import Money from '../game_objects/Money';
 import { GameObject } from '../game_objects/types';
-
-enum AssetKeys {
-  GameBg = 'game-bg',
-  Floor = 'floor',
-}
 
 export default class Game extends BaseScene {
   constructor() {
@@ -23,7 +18,8 @@ export default class Game extends BaseScene {
   private cursors: Cursors;
   private ground: StaticGround;
   private healthBar: HealthBar;
-  private imgAssets: ImageAsset[] = [
+  private isPlayerFalling: boolean = false;
+  private imgAssets: Asset[] = [
     {
       key: AssetKeys.GameBg,
       url: 'Background.png',
@@ -33,6 +29,33 @@ export default class Game extends BaseScene {
       url: 'tile.png',
     },
   ];
+
+  private audioAssets: Asset[] = [
+    {
+      key: AssetKeys.CollectSound,
+      url: 'collect.wav',
+    },
+    {
+      key: AssetKeys.HitSound,
+      url: 'hit.wav',
+    },
+    {
+      key: AssetKeys.JumpSound,
+      url: 'jump.wav',
+    },
+    {
+      key: AssetKeys.DeathSound,
+      url: 'death.wav',
+    },
+    {
+      key: AssetKeys.RunningSound,
+      url: 'running.wav',
+    },
+    {
+      key: AssetKeys.BackgroundSound,
+      url: 'background.mp3',
+    }
+  ]
 
   private createBackground = () => {
     // background image
@@ -86,6 +109,7 @@ export default class Game extends BaseScene {
     } else {
       // game over
       console.log('game over fool');
+      this.sound.play(AssetKeys.DeathSound);
     }
   };
 
@@ -137,8 +161,13 @@ export default class Game extends BaseScene {
     }
   }
 
+  private preLoadSoundAssets = () => {
+    this.load.audio(this.audioAssets);
+  }
+
   private playerAndMoneyOverlapCallback = (money: Money) => {
     money.destroy();
+    this.sound.play(AssetKeys.CollectSound);
     this.increasePlayerHealth();
   }
        
@@ -156,6 +185,16 @@ export default class Game extends BaseScene {
     }
   };
 
+  private playPlayerHitsGroundSound = () => {
+    if (this.playerInstance.player.body.onFloor() && this.isPlayerFalling) {
+      this.sound.play(AssetKeys.HitSound);
+      this.isPlayerFalling = false;
+    }
+    if (this.playerInstance.player.body.velocity.y > 0) {
+      this.isPlayerFalling = true;
+    }
+  }
+
   // engine methods
   init() {
     this.loadWindowDimensions();
@@ -167,6 +206,7 @@ export default class Game extends BaseScene {
     this.load.image(this.imgAssets);
     this.playerInstance.loadPlayerSprites();
     this.preLoadMoneyAsset();
+    this.preLoadSoundAssets();
   }
 
   create() {
@@ -179,11 +219,17 @@ export default class Game extends BaseScene {
     this.playerInstance.addPlayerCollider(this.ground);
     // health bar
     this.healthBar = this.createPlayerHealthBar(this.centerX, 50, 0xe74c3c);
+    // plays background music
+    this.sound.play(AssetKeys.BackgroundSound, {
+      loop: true,
+      volume: 0.5,
+    });
   }
   private timer: number = 0;
   update(time: number, delta: number) {
     this.playerInstance.playerMovement(this.cursors);
     this.updateHealthBar(this.healthBar, 0.10 * this.playerHealth);
     this.slowlyLowerPlayerHealthAndMakeItRain(delta, Game.RAIN_INTERVAL);
+    this.playPlayerHitsGroundSound();
   }
 }

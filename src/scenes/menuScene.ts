@@ -1,5 +1,5 @@
 import BaseScene from './BaseScene';
-import { ImageAsset } from './types';
+import { Asset } from './types';
 
 // Add asset keys here
 enum AssetKeys {
@@ -13,7 +13,7 @@ export default class MenuScene extends BaseScene {
   }
 
   // image assets
-  private imgAssets: ImageAsset[] = [
+  private imgAssets: Asset[] = [
     {
       key: AssetKeys.StartBtn,
       url: 'Start_BTN.png',

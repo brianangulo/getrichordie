@@ -6,6 +6,7 @@ import {
   GameObject,
   Cursors,
 } from './types';
+import { AssetKeys } from '../scenes/types';
 
 enum AnimationsKeys {
   Damage = 'damage',
@@ -145,16 +146,34 @@ class Player {
     if (right) {
       this.player.x += 6;
       this.player.anims.play(AnimationsKeys.Runing, true);
+      this.player.anims
+        .play(AnimationsKeys.Runing, true)
+        .once(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
+          this.scene.sound.play(AssetKeys.HitSound, {
+            volume: 0.08,
+            detune: 500,
+            delay: 0.3,
+          });
+        });
       this.player.flipX = false;
     }
     if (left) {
       this.player.x -= 6;
-      this.player.anims.play(AnimationsKeys.Runing, true);
+      this.player.anims
+        .play(AnimationsKeys.Runing, true)
+        .once(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
+          this.scene.sound.play(AssetKeys.HitSound, {
+            volume: 0.08,
+            detune: 300,
+            delay: 0.3,
+          });
+        });
       this.player.flipX = true;
     }
     // if the player is also on the ground we set velocity
     if (up && onGround) {
       this.player.body.setVelocityY(-350);
+      this.scene.sound.play(AssetKeys.JumpSound);
     }
     if (!onGround) {
       this.player.anims.play(AnimationsKeys.Jump, true);
@@ -168,8 +187,11 @@ class Player {
    * Adds collision with the player
    * @param object a game object to check for collisions against the player
    */
-  public addPlayerCollider = (object: GameObject) => {
-    this.scene.physics.add.collider(this.player, object);
+  public addPlayerCollider = (
+    object: GameObject,
+    callback?: (player: GameObject, object: GameObject) => void
+  ) => {
+    this.scene.physics.add.collider(this.player, object, callback);
   };
 
   /**
