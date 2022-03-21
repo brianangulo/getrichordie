@@ -1,6 +1,6 @@
-# A simple HTML game
+# Get Rich or Die
 
-This is a simple HTML Game
+Get rich or Die is a simple canvas HTML5 game where the goal is to collect as much cash tokens as possible in order to survive as your health continues to drop
 
 ![Screen Shot 2022-02-19 at 10 11 31 PM](https://user-images.githubusercontent.com/59832188/154828127-a1b36733-69cd-4f42-be63-e8b02e5cc872.png)
 
